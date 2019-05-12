@@ -23,13 +23,9 @@ export class TorizonDeviceProvider
 		this._onDidChangeTreeData.fire();
 	}
 
-	refreshItemExpander(item: DockerImage): void {
-		console.log("refreshing item ...");
-
-		if (item.father)
-			this._onDidChangeTreeData.fire(item.father);
-		else
-			this._onDidChangeTreeData.fire();
+	refreshDevice(item: Device): void {
+		console.log("refreshing device ...");
+		this._onDidChangeTreeData.fire(item);
 	}
 
 	getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
@@ -111,6 +107,7 @@ export class TorizonDeviceProvider
 					opts.push(new ContainerOptions(
 						"Remove",
 						docker.ip,
+						docker
 					));
 					opts[3].defineCommand(
 						'extension.deleteContainer',
@@ -126,7 +123,8 @@ export class TorizonDeviceProvider
 
 					opts.push(new ContainerOptions(
 						"Run",
-						docker.ip
+						docker.ip,
+						docker
 					));
 					opts[0].defineCommand(
 						'extension.runContainer',
@@ -170,7 +168,8 @@ export class TorizonDeviceProvider
 
 					opts.push(new ContainerOptions(
 						"Run docker.run",
-						docker.ip
+						docker.ip,
+						docker
 					));
 					opts[4].defineCommand(
 						'extension.runDockerRunFileContainer',
@@ -261,13 +260,15 @@ export class TorizonDeviceProvider
 		dumbs.push(new ExpandImageContainers(
 			"Images",
 			(elem.ip ? elem.ip : ""),
-			1
+			1,
+			elem
 		));
 
 		dumbs.push(new ExpandImageContainers(
 			"Containers",
 			(elem.ip ? elem.ip : ""),
-			1
+			1,
+			elem
 		));
 
 		return Promise.resolve(dumbs);
@@ -308,8 +309,7 @@ export class TorizonDeviceProvider
 							),
 							"image",
 							el.ip,
-							undefined,
-							el
+							el.father
 						);
 
 						objs.push(dockImg);
@@ -351,6 +351,7 @@ export class TorizonDeviceProvider
 							0,
 							"container",
 							el.ip,
+							el.father
 						);
 
 						objs.push(dockImg);
@@ -420,6 +421,7 @@ class ExpandImageContainers extends vscode.TreeItem {
 		public ip: string,
 		public readonly collapsibleState: 
 			vscode.TreeItemCollapsibleState,
+		public father: Device,
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
@@ -464,8 +466,8 @@ class DockerImage extends vscode.TreeItem {
 		public readonly size: number,
 		public readonly type: string,
 		public readonly ip: string,
+		public readonly father: Device,
 		public readonly command?: vscode.Command,
-		public readonly father?: ExpandImageContainers
 	)
 	{
 		super(name, 1);

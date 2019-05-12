@@ -47,22 +47,25 @@ export function activate(context: vscode.ExtensionContext) {
 			let ssh = new SSHCommands(ip);
 			ssh.restartContainer(name);
 		});
+
 	vscode.commands.registerCommand('extension.deleteContainer', 
-		(name: string, ip: string) => {
+			(name: string, ip: string, node: ContainerOptions) => {
 			let ssh = new SSHCommands(ip);
-			ssh.deleteContainer(name).then((refresh) => {
-				if (refresh) {
-					nodeDependenciesProvider.refresh();
-				}
-			});
+		ssh.deleteContainer(name).then((refresh) => {
+			if (refresh) {
+				if (node.image)
+				nodeDependenciesProvider.refreshDevice(node.image.father);
+			}
 		});
+	});
 	
 	/* image commands */
 	vscode.commands.registerCommand('extension.runCommandContainer', 
-		(name: string, ip: string) => {
-			let ssh = new SSHCommands(ip);
-			ssh.runImage(name);
-		});
+			(name: string, ip: string) => {
+		let ssh = new SSHCommands(ip);
+		ssh.runImage(name);
+	});
+
 	vscode.commands.registerCommand('nodeDependencies.addImageEntry', (node: Device) => {
 		let localCmd: LocalCommands = new LocalCommands(<string> node.ip);
 		//localCmd.execDockerFile(
@@ -77,10 +80,12 @@ export function activate(context: vscode.ExtensionContext) {
 			(name: string, ip: string, node: ContainerOptions) => {
 		let ssh = new SSHCommands(node.ip);
 		ssh.runImage(name).then(ret => {
-			if (ret)
+			if (ret) {
 				vscode.window
 					.showInformationMessage(`New container from ${name} created 😎`);
-			else
+				if (node.image)
+				nodeDependenciesProvider.refreshDevice(node.image.father)
+			} else
 				vscode.window
 					.showErrorMessage(`Error trying to create container from ${name}`);
 		});
@@ -95,7 +100,7 @@ export function activate(context: vscode.ExtensionContext) {
 				if (ret) {
 					if (node.image)
 					nodeDependenciesProvider
-						.refreshItemExpander(node.image);
+						.refreshDevice(node.image.father);
 					vscode.window
 						.showInformationMessage(
 							`Image ${name} deleted 😎`);
