@@ -86,7 +86,7 @@ export class SSHCommands {
 		this.ssh.exec(`docker start ${name}`, {
 			out: function(stdout: string) {
 				if (name == stdout.trim()) {
-					vscode.window.showInformationMessage(`${name} started`);
+					vscode.window.showInformationMessage(`${name} started 😎`);
 				} else {
 					vscode.window.showErrorMessage(`Error trying to start ${name}`);
 				}
@@ -103,7 +103,7 @@ export class SSHCommands {
 		this.ssh.exec(`docker stop ${name}`, {
 			out: function(stdout: string) {
 				if (name == stdout.trim()) {
-					vscode.window.showInformationMessage(`${name} stoped`);
+					vscode.window.showInformationMessage(`${name} stoped 😎`);
 				} else {
 					vscode.window.showErrorMessage(`Error trying to stop ${name}`);
 				}
@@ -120,7 +120,7 @@ export class SSHCommands {
 		this.ssh.exec(`docker restart ${name}`, {
 			out: function(stdout: string) {
 				if (name == stdout.trim())
-					vscode.window.showInformationMessage(`${name} restarted`);
+					vscode.window.showInformationMessage(`${name} restarted 😎`);
 				else
 					vscode.window.showErrorMessage(`Error trying to restart ${name}`);
 			},
@@ -147,7 +147,7 @@ export class SSHCommands {
 					this.ssh.exec(`docker rm -vf ${name}`, {
 						out: function(stdout: string) {
 							if (name == stdout.trim()) {
-								vscode.window.showInformationMessage(`${name} removed`);
+								vscode.window.showInformationMessage(`${name} removed 😎`);
 								resolve(true);
 							} else {
 								vscode.window.showErrorMessage(`Error trying to remove ${name}`);
@@ -169,6 +169,31 @@ export class SSHCommands {
 		return new Promise(resolve => {
 			/* normal run */
 			this.ssh.exec(`docker run --name ${this.appName} -d -it ${name}`, {
+				out: function(stdout: string) {
+					console.log(stdout);
+				},
+				err: function(stderr: string) {
+					vscode.window
+						.showErrorMessage(stderr);
+				},
+				exit: function(code: any) {
+					if (code === 0)
+						resolve(true);
+					else
+						resolve(false);
+				}
+			}).start();
+		});
+	}
+
+	runXorgImage(name: string): Promise<boolean>
+	{
+		return new Promise(resolve => {
+			/* normal run */
+			this.ssh.exec(`docker run --name ${this.appName} \
+			-d -it --privileged \
+			-v /var/run/dbus:/var/run/dbus \
+			-v /dev:/dev ${name}`, {
 				out: function(stdout: string) {
 					console.log(stdout);
 				},

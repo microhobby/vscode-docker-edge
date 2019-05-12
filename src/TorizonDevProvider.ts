@@ -135,7 +135,8 @@ export class TorizonDeviceProvider
 
 					opts.push(new ContainerOptions(
 						"Run Xorg",
-						docker.ip
+						docker.ip,
+						docker
 					));
 					opts[1].defineCommand(
 						'extension.runXorgContainer',
