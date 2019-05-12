@@ -3,7 +3,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { TorizonDeviceProvider, Device } from './TorizonDevProvider';
+import { TorizonDeviceProvider, Device, ContainerOptions } from './TorizonDevProvider';
 import { SSHCommands } from './SSHCommands';
 import { LocalCommands } from './LocalCommands';
 
@@ -65,10 +65,19 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 	vscode.commands.registerCommand('nodeDependencies.addImageEntry', (node: Device) => {
 		let localCmd: LocalCommands = new LocalCommands(<string> node.ip);
-		localCmd.execDockerFile((ret: boolean) => {
+		//localCmd.execDockerFile(
+		localCmd.execDockerFileFromRegistry(
+		(ret: boolean) => {
 			if (ret)
 				nodeDependenciesProvider.refresh();
 		});
+	});
+	vscode.commands.registerCommand('extension.runDeleteFileContainer', 
+			(name: string, ip: string, node: ContainerOptions) => {
+		let ssh = new SSHCommands(node.ip);
+
+		if (node.image)
+			ssh.deleteImage(node.image.id);
 	});
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)

@@ -68,7 +68,7 @@ export class TorizonDeviceProvider
 
 					opts.push(new ContainerOptions(
 						"Start",
-						docker.ip
+						docker.ip,
 					));
 					opts[0].defineCommand(
 						'extension.startContainer',
@@ -101,7 +101,7 @@ export class TorizonDeviceProvider
 
 					opts.push(new ContainerOptions(
 						"Remove",
-						docker.ip
+						docker.ip,
 					));
 					opts[3].defineCommand(
 						'extension.deleteContainer',
@@ -168,6 +168,18 @@ export class TorizonDeviceProvider
 						docker.name, 
 						docker.ip,
 						opts[4]
+					);
+
+					opts.push(new ContainerOptions(
+						"Delete image",
+						docker.ip,
+						docker
+					));
+					opts[5].defineCommand(
+						'extension.runDeleteFileContainer',
+						docker.name, 
+						docker.ip,
+						opts[5]
 					);
 
 					return Promise.resolve(opts);
@@ -340,12 +352,13 @@ export class TorizonDeviceProvider
 	}
 }
 
-class ContainerOptions extends vscode.TreeItem {
+export class ContainerOptions extends vscode.TreeItem {
 	public deleted = false;
 	
 	constructor(
 		public readonly label: string,
-		public ip: string
+		public ip: string,
+		public image?: DockerImage
 	) {
 		super(label, 0);
 	}
