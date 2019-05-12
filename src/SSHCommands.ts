@@ -33,6 +33,7 @@ export class SSHCommands {
 							resolve(false);
 						},
 						err: function(stderr: string) {
+							if (stderr.indexOf("Password") == -1)
 							vscode.window
 								.showErrorMessage(stderr);
 						},
@@ -47,6 +48,40 @@ export class SSHCommands {
 				} else {
 					vscode.window.showWarningMessage("No internet connection? 🤔");
 					resolve(false);
+				}
+			});
+		});
+	}
+
+	pullImageFromDockerHub(winOut: vscode.OutputChannel): Promise<boolean> {
+		let ssh = this.ssh;
+
+		let options: vscode.InputBoxOptions = {
+			prompt: "",
+			placeHolder: "torizon/arm32v7-debian-weston"
+		}
+
+		/* first get my local ip */
+		return new Promise(resolve => {
+			vscode.window.showInputBox(options).then(value => {
+				if (value != undefined) {
+					winOut.show();
+					ssh.exec(`docker pull ${value}`, {
+						out: function(stdout: string) {
+							winOut.appendLine("✔️" + stdout);
+						},
+						err: function(stderr: string) {
+							vscode.window
+								.showErrorMessage(stderr);
+						},
+						exit: function(code: any) {
+							if (code === 0) {
+								vscode.window.showInformationMessage(`Image ${value} downloaded with success 😎`);
+								resolve(true);
+							} else
+								resolve(false);
+						}
+					}).start();
 				}
 			});
 		});

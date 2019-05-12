@@ -100,7 +100,19 @@ export function activate(context: vscode.ExtensionContext) {
 		localCmd.execDockerFileFromRegistry(
 		(ret: boolean) => {
 			if (ret)
-				nodeDependenciesProvider.refresh();
+				nodeDependenciesProvider.refreshDevice(node);
+		});
+	});
+
+	vscode.commands.registerCommand('nodeDependencies.addImageDockerHub', (node: Device) => {
+		let ssh = new SSHCommands(<string> node.ip);
+		let out = vscode.window.createOutputChannel("Pull from dockerhub");
+
+		ssh.pullImageFromDockerHub(out).then(ret => {
+			if (ret) {
+				out.hide();
+				nodeDependenciesProvider.refreshDevice(node);
+			}
 		});
 	});
 

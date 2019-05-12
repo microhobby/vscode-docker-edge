@@ -31,7 +31,11 @@
       },
       {
         "command": "nodeDependencies.addImageEntry",
-        "title": "Build to and Push"
+        "title": "Build and Push"
+      },
+      {
+        "command": "nodeDependencies.addImageDockerHub",
+        "title": "Pull from DockerHub"
       },
       {
         "command": "nodeDependencies.dockerFile",
@@ -65,7 +69,12 @@
           "command": "nodeDependencies.addImageEntry",
           "when": "view == nodeDependencies && viewItem == device",
           "group": "navigation"
-        }
+	},
+	{
+          "command": "nodeDependencies.addImageDockerHub",
+          "when": "view == nodeDependencies && viewItem == device",
+          "group": "navigation"
+	}
       ]
     },
     "viewsContainers": {
