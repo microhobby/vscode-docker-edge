@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Device } from './TorizonDevProvider';
+import { Device, DockerImage } from './TorizonDevProvider';
 const SSH = require('simple-ssh');
 const network = require('network');
 
@@ -165,11 +165,11 @@ export class SSHCommands {
 		});
 	}
 
-	runImage(name: string): Promise<boolean>
+	runImage(name: string, image: DockerImage): Promise<boolean>
 	{
 		return new Promise(resolve => {
 			/* normal run */
-			this.ssh.exec(`docker run --name ${this.appName} -d -it ${name}`, {
+			this.ssh.exec(`docker run --name ${this.appName} -d -it ${name}:${image.tag}`, {
 				out: function(stdout: string) {
 					console.log(stdout);
 				},
@@ -187,14 +187,14 @@ export class SSHCommands {
 		});
 	}
 
-	runXorgImage(name: string): Promise<boolean>
+	runXorgImage(name: string, image: DockerImage): Promise<boolean>
 	{
 		return new Promise(resolve => {
 			/* normal run */
 			this.ssh.exec(`docker run --name ${this.appName} \
 			-d -it --privileged \
 			-v /var/run/dbus:/var/run/dbus \
-			-v /dev:/dev ${name} startx`, {
+			-v /dev:/dev ${name}:${image.tag} startx`, {
 				out: function(stdout: string) {
 					console.log(stdout);
 				},
@@ -212,12 +212,12 @@ export class SSHCommands {
 		});
 	}
 
-	runWestonImage(name: string, device: Device): Promise<boolean>
+	runWestonImage(name: string, image: DockerImage): Promise<boolean>
 	{
 		return new Promise(resolve => {
 			let usePixman: string = "";
 
-			if (device.label.indexOf("iMX7D") != -1) {
+			if (image.father.label.indexOf("iMX7D") != -1) {
 				usePixman = "-- --use-pixman";
 			}
 
@@ -225,7 +225,8 @@ export class SSHCommands {
 			this.ssh.exec(`docker run --name ${this.appName} \
 			-d -it --privileged \
 			-v /tmp:/tmp \
-			${name} weston-launch --tty=/dev/tty7 --user=root ${usePixman}`, {
+			${name}:${image.tag} \
+			weston-launch --tty=/dev/tty7 --user=root ${usePixman}`, {
 				out: function(stdout: string) {
 					console.log(stdout);
 				},

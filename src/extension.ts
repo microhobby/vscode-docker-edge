@@ -3,7 +3,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { TorizonDeviceProvider, Device, ContainerOptions } from './TorizonDevProvider';
+import { TorizonDeviceProvider, Device, ContainerOptions, DockerImage } from './TorizonDevProvider';
 import { SSHCommands } from './SSHCommands';
 import { LocalCommands } from './LocalCommands';
 
@@ -61,9 +61,11 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	/* image commands */
 	vscode.commands.registerCommand('extension.runCommandContainer', 
-			(name: string, ip: string) => {
+			(name: string, ip: string, node: ContainerOptions) => {
 		let ssh = new SSHCommands(ip);
-		ssh.runImage(name);
+
+		if (node.image)
+			ssh.runImage(name, node.image);
 	});
 
 	vscode.commands.registerCommand('nodeDependencies.addImageEntry', (node: Device) => {
@@ -79,7 +81,9 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('extension.runContainer',
 			(name: string, ip: string, node: ContainerOptions) => {
 		let ssh = new SSHCommands(node.ip);
-		ssh.runImage(name).then(ret => {
+
+		if (node.image)
+		ssh.runImage(name, node.image).then(ret => {
 			if (ret) {
 				vscode.window
 					.showInformationMessage(`New container from ${name} created 😎`);
@@ -94,7 +98,9 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('extension.runXorgContainer',
 			(name: string, ip: string, node: ContainerOptions) => {
 		let ssh = new SSHCommands(node.ip);
-		ssh.runXorgImage(name).then(ret => {
+
+		if (node.image)
+		ssh.runXorgImage(name, node.image).then(ret => {
 			if (ret) {
 				vscode.window
 					.showInformationMessage(`New container from ${name} created 😎`);
@@ -111,7 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
 		let ssh = new SSHCommands(node.ip);
 		
 		if(node.image)
-		ssh.runWestonImage(name, node.image.father).then(ret => {
+		ssh.runWestonImage(name, node.image).then(ret => {
 			if (ret) {
 				vscode.window
 					.showInformationMessage(`New container from ${name} created 😎`);

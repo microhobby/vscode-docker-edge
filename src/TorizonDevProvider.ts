@@ -159,7 +159,8 @@ export class TorizonDeviceProvider
 
 					opts.push(new ContainerOptions(
 						"Run command",
-						docker.ip
+						docker.ip,
+						docker
 					));
 					opts[3].defineCommand(
 						'extension.runCommandContainer',
@@ -460,7 +461,7 @@ class ExpandImageContainers extends vscode.TreeItem {
 	contextValue = 'ExpandContainersImage';
 }
 
-class DockerImage extends vscode.TreeItem {
+export class DockerImage extends vscode.TreeItem {
 	constructor(
 		public readonly name: string,
 		public readonly tag: string,
