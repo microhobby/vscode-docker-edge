@@ -23,13 +23,47 @@ export class SSHCommands {
 			network.get_active_interface(function(err: any, obj: any) {
 				if (!err) {
 					let myip = obj.ip_address;
-					ssh.exec(`echo 'torizon' | sudo -S systemctl stop docker && echo 'torizon' | sudo -S dockerd --insecure-registry ${myip}:5000`, {
+					ssh.exec(`echo 'torizon' | sudo -S bash -c "echo '{ \\\"insecure-registries\\\" : [\\\"${myip}:5000\\\"] }' > /etc/docker/daemon.json && systemctl restart docker"`, {
 						out: function(stdout: string) {
 							/* we will never reach this */
 							console.log(stdout);
+							resolve(false);
+						},
+						exit: function(code: any) {
+							console.log(code);
+							if (code === 0)
+								resolve(true);
+							else
+								resolve(false);
 						}
 					}).start();
-					resolve(true);
+				} else {
+					vscode.window.showWarningMessage("No internet connection? 🤔");
+					resolve(false);
+				}
+			});
+		});
+	}
+
+	pullImageFromMyRegistry(name: string, winOut: vscode.OutputChannel): Promise<boolean> {
+		let ssh = this.ssh;
+
+		/* first get my local ip */
+		return new Promise(resolve => {
+			network.get_active_interface(function(err: any, obj: any) {
+				if (!err) {
+					let myip = obj.ip_address;
+					ssh.exec(`docker pull ${myip}:5000/${name}`, {
+						out: function(stdout: string) {
+							winOut.appendLine("✔️" + stdout);
+						},
+						exit: function(code: any) {
+							if (code === 0)
+								resolve(true);
+							else
+								resolve(false);
+						}
+					}).start();
 				} else {
 					vscode.window.showWarningMessage("No internet connection? 🤔");
 					resolve(false);
