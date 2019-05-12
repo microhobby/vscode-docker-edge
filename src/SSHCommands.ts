@@ -188,11 +188,11 @@ export class SSHCommands {
 		});
 	}
 
-	runImageWithArgs(name: string, image: DockerImage): Promise<boolean>
+	runImageWithCmd(name: string, image: DockerImage): Promise<boolean>
 	{
 		let options: vscode.InputBoxOptions = {
 			prompt: "",
-			placeHolder: "arg1 arg2 arg3"
+			placeHolder: "cmd arg1 arg2 arg3"
 		}
 
 		return new Promise(resolve => {
@@ -207,6 +207,39 @@ export class SSHCommands {
 					-v /tmp:/tmp \
 					${name}:${image.tag} \
 					${args}`, {
+						out: function(stdout: string) {
+							console.log(stdout);
+						},
+						err: function(stderr: string) {
+							vscode.window
+								.showErrorMessage(stderr);
+						},
+						exit: function(code: any) {
+							if (code === 0)
+								resolve(true);
+							else
+								resolve(false);
+						}
+					}).start();
+				}
+			});
+		});
+	}
+
+	runImageWithArgs(name: string, image: DockerImage): Promise<boolean>
+	{
+		let options: vscode.InputBoxOptions = {
+			prompt: "",
+			placeHolder: "arg1 arg2 arg3"
+		}
+
+		return new Promise(resolve => {
+			vscode.window.showInputBox(options).then(args => {
+				if (args != undefined) {
+					/* run generic with arguments */
+					this.ssh.exec(`docker run \
+					${args} \
+					${name}:${image.tag}`, {
 						out: function(stdout: string) {
 							console.log(stdout);
 						},

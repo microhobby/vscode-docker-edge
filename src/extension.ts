@@ -65,6 +65,23 @@ export function activate(context: vscode.ExtensionContext) {
 		let ssh = new SSHCommands(node.ip);
 
 		if (node.image)
+		ssh.runImageWithCmd(name, node.image).then(ret => {
+			if (ret) {
+				vscode.window
+					.showInformationMessage(`New container from ${name} created 😎`);
+				if (node.image)
+				nodeDependenciesProvider.refreshDevice(node.image.father)
+			} else
+				vscode.window
+					.showErrorMessage(`Error trying to create container from ${name}`);
+		});
+	});
+
+	vscode.commands.registerCommand('extension.runArgsContainer', 
+			(name: string, ip: string, node: ContainerOptions) => {
+		let ssh = new SSHCommands(node.ip);
+
+		if (node.image)
 		ssh.runImageWithArgs(name, node.image).then(ret => {
 			if (ret) {
 				vscode.window
