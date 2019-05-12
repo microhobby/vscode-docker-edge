@@ -11,6 +11,10 @@ import { LocalCommands } from './LocalCommands';
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
+	/* first time here? */
+	let local = new LocalCommands("");
+	local.runRegistryContainer();
+
 	/* tree view */
 	const nodeDependenciesProvider = 
 		new TorizonDeviceProvider(vscode.workspace.rootPath);

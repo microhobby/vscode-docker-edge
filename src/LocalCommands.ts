@@ -14,6 +14,31 @@ export class LocalCommands {
 	constructor(private ip: string)
 	{}
 
+	runRegistryContainer(): void {
+		let child: any = cp.exec("docker ps", (err: any, stdout: string, stderr: string) => {
+			if (err) {
+				vscode.window.showErrorMessage("Please install Docker!");
+			} else if (stdout.indexOf("registry:2") == -1){
+				let out: vscode.OutputChannel = vscode.window.createOutputChannel("Torizon registry config");
+				let child2: any = cp.exec("docker run -d -p 5000:5000 --restart always --name registry registry:2",
+				(err: any, stdout: string, stderr: string) => {
+					if (err)
+						vscode.window.showErrorMessage("Error trying to up registry:2");
+					else {
+						vscode.window.showInformationMessage("Success config 😎");
+						out.appendLine("Thank you for choosing Toradex 😁");
+					}
+				});
+				
+				out.show();
+				out.appendLine("First time running Torizon vscode Extension");
+				child2.stdout.on('data', function(data: any) {
+					out.append(data.toString());
+				});
+			}
+		});
+	}
+
 	execDockerFile(cbk: any): void {
 		/* TODO PLEASE REFACTOR THIS CALLBACK HELL use promises */
 		let out: vscode.OutputChannel = vscode.window.createOutputChannel("Torizon Push");
@@ -42,7 +67,7 @@ export class LocalCommands {
 									out.appendLine("******************* Running Pushing Image ********************");
 									
 									/* here the son cry and mother do not see */
-									out.append("Pushing ");
+									out.append("⌚ Pushing ");
 									let intv = setInterval(() => {
 										out.append(".");
 									}, 500);
@@ -63,7 +88,7 @@ export class LocalCommands {
 
 											vscode.window.showInformationMessage("Loading image ....");
 											out.appendLine("******************* Running Loading Image ********************");
-											out.append("Loading ");
+											out.append("⌚ Loading ");
 
 											let ssh = new SSHCommands(ips);
 											let interv = setInterval(() => {
