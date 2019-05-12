@@ -1,0 +1,116 @@
+{
+  "name": "torizon",
+  "displayName": "Torizon",
+  "description": "Toradex Vscode Extension for Torizon Core OS",
+  "version": "0.0.1",
+  "publisher": "Toradex",
+  "engines": {
+    "vscode": "^1.33.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.helloWorld",
+    "onView:nodeDependencies"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "nodeDependencies.refreshEntry",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "nodeDependencies.addImageEntry",
+        "title": "Build to and Push"
+      },
+      {
+        "command": "nodeDependencies.dockerFile",
+        "title": "Run Dockerfile and push",
+        "icon": {
+          "light": "resources/light/boolean.svg",
+          "dark": "resources/dark/boolean.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "nodeDependencies.refreshEntry",
+          "when": "view == nodeDependencies",
+          "group": "navigation"
+        },
+        {
+          "command": "nodeDependencies.dockerFile",
+          "when": "view == nodeDependencies",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "nodeDependencies.refreshEntry",
+          "when": "view == nodeDependencies && viewItem == device",
+          "group": "navigation"
+        },
+        {
+          "command": "nodeDependencies.addImageEntry",
+          "when": "view == nodeDependencies && viewItem == device",
+          "group": "navigation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "torizon-explorer",
+          "title": "Torizon Explorer",
+          "icon": "media/torizon.png"
+        }
+      ]
+    },
+    "views": {
+      "torizon-explorer": [
+        {
+          "id": "nodeDependencies",
+          "name": "Toradex Devices"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^3.3.1",
+    "vscode": "^1.1.28",
+    "tslint": "^5.12.1",
+    "@types/node": "^10.12.21",
+    "@types/mocha": "^2.2.42",
+    "@types/mkdirp": "^0.5.2",
+    "@types/rimraf": "^2.0.2"
+  },
+  "dependencies": {
+    "ftp": "^0.3.10",
+    "jsonc-parser": "^0.4.2",
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.2",
+    "network-list": "^1.1.5",
+    "async": "^2.6.2",
+    "simple-ssh": "^1.0.0",
+    "node-ssh": "^6.0.0",
+    "scp2": "^0.5.0"
+  }
+}
