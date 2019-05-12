@@ -2,9 +2,11 @@ import * as vscode from 'vscode';
 import { Device, DockerImage } from './TorizonDevProvider';
 const SSH = require('simple-ssh');
 const network = require('network');
+const fs = require('fs');
 
 export class SSHCommands {
 	private ssh: any;
+	private localPath: string = <string> vscode.workspace.rootPath;
 
 	constructor(private ip: string)
 	{
@@ -264,6 +266,45 @@ export class SSHCommands {
 			-v /tmp:/tmp \
 			${name}:${image.tag} \
 			weston-launch --tty=/dev/tty7 --user=root ${usePixman}`, {
+				out: function(stdout: string) {
+					console.log(stdout);
+				},
+				err: function(stderr: string) {
+					vscode.window
+						.showErrorMessage(stderr);
+				},
+				exit: function(code: any) {
+					if (code === 0)
+						resolve(true);
+					else
+						resolve(false);
+				}
+			}).start();
+		});
+	}
+
+	runExtensionDockerRunFile(name: string, image: DockerImage): Promise<boolean>
+	{
+		let tag = image.tag;
+		let cmd = "";
+
+		try {
+			fs.readFileSync(`${this.localPath}/docker.run`, 'utf8');
+		} catch (err) {
+			if (err.errno == -2)
+				vscode.window.showErrorMessage("No docker.run file on your project folder 🤔");
+			else
+				vscode.window.showErrorMessage(err);
+			return Promise.resolve(false);
+		}
+
+		if (cmd.indexOf("${image}") != -1) {
+			cmd = cmd.replace("${image}", `${name}:${tag}`);
+		}
+
+		/* open the file */
+		return new Promise(resolve => {
+			this.ssh.exec(cmd, {
 				out: function(stdout: string) {
 					console.log(stdout);
 				},

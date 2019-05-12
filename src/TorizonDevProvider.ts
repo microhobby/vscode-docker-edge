@@ -158,15 +158,27 @@ export class TorizonDeviceProvider
 					);
 
 					opts.push(new ContainerOptions(
-						"Run command",
+						"Run args",
 						docker.ip,
 						docker
 					));
 					opts[3].defineCommand(
-						'extension.runCommandContainer',
+						'extension.runArgsContainer',
 						docker.name, 
 						docker.ip,
 						opts[3]
+					);
+
+					opts.push(new ContainerOptions(
+						"Run command",
+						docker.ip,
+						docker
+					));
+					opts[4].defineCommand(
+						'extension.runCommandContainer',
+						docker.name, 
+						docker.ip,
+						opts[4]
 					);
 
 					opts.push(new ContainerOptions(
@@ -174,11 +186,11 @@ export class TorizonDeviceProvider
 						docker.ip,
 						docker
 					));
-					opts[4].defineCommand(
+					opts[5].defineCommand(
 						'extension.runDockerRunFileContainer',
 						docker.name, 
 						docker.ip,
-						opts[4]
+						opts[5]
 					);
 
 					opts.push(new ContainerOptions(
@@ -186,11 +198,11 @@ export class TorizonDeviceProvider
 						docker.ip,
 						docker,
 					));
-					opts[5].defineCommand(
+					opts[6].defineCommand(
 						'extension.runDeleteFileContainer',
 						docker.name, 
 						docker.ip,
-						opts[5]
+						opts[6]
 					);
 
 					return Promise.resolve(opts);
