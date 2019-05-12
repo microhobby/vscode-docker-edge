@@ -30,6 +30,10 @@ export class SSHCommands {
 							console.log(stdout);
 							resolve(false);
 						},
+						err: function(stderr: string) {
+							vscode.window
+								.showErrorMessage(stderr);
+						},
 						exit: function(code: any) {
 							console.log(code);
 							if (code === 0)
@@ -58,6 +62,10 @@ export class SSHCommands {
 						out: function(stdout: string) {
 							winOut.appendLine("✔️" + stdout);
 						},
+						err: function(stderr: string) {
+							vscode.window
+								.showErrorMessage(stderr);
+						},
 						exit: function(code: any) {
 							if (code === 0)
 								resolve(true);
@@ -82,7 +90,11 @@ export class SSHCommands {
 				} else {
 					vscode.window.showErrorMessage(`Error trying to start ${name}`);
 				}
-			}
+			},
+			err: function(stderr: string) {
+				vscode.window
+					.showErrorMessage(stderr);
+			},
 		}).start();
 	}
 
@@ -95,7 +107,11 @@ export class SSHCommands {
 				} else {
 					vscode.window.showErrorMessage(`Error trying to stop ${name}`);
 				}
-			}
+			},
+			err: function(stderr: string) {
+				vscode.window
+					.showErrorMessage(stderr);
+			},
 		}).start();
 	}
 
@@ -107,7 +123,11 @@ export class SSHCommands {
 					vscode.window.showInformationMessage(`${name} restarted`);
 				else
 					vscode.window.showErrorMessage(`Error trying to restart ${name}`);
-			}
+			},
+			err: function(stderr: string) {
+				vscode.window
+					.showErrorMessage(stderr);
+			},
 		}).start();
 	}
 
@@ -133,7 +153,11 @@ export class SSHCommands {
 								vscode.window.showErrorMessage(`Error trying to remove ${name}`);
 								resolve(false);
 							}
-						}
+						},
+						err: function(stderr: string) {
+							vscode.window
+								.showErrorMessage(stderr);
+						},
 					}).start();
 				}
 			});
@@ -147,6 +171,10 @@ export class SSHCommands {
 			this.ssh.exec(`docker run --name ${this.appName} -d -it ${name}`, {
 				out: function(stdout: string) {
 					console.log(stdout);
+				},
+				err: function(stderr: string) {
+					vscode.window
+						.showErrorMessage(stderr);
 				},
 				exit: function(code: any) {
 					if (code === 0)
@@ -172,6 +200,10 @@ export class SSHCommands {
 					} else {
 						resolve(false);
 					}
+				},
+				err: function(stderr: string) {
+					vscode.window
+						.showErrorMessage(stderr);
 				}
 			}).start();
 		});
@@ -190,6 +222,10 @@ export class SSHCommands {
 					this.ssh.exec(`docker rmi ${id}`, {
 						out: function(stdout: string) {
 							console.log(stdout);
+						},
+						err: function(stderr: string) {
+							vscode.window
+								.showErrorMessage(stderr);
 						},
 						exit: function(code: any) {
 							if (code === 0)
