@@ -190,8 +190,12 @@ export class SSHCommands {
 					this.ssh.exec(`docker rmi ${id}`, {
 						out: function(stdout: string) {
 							console.log(stdout);
-		
-							resolve(false);
+						},
+						exit: function(code: any) {
+							if (code === 0)
+								resolve(true);
+							else
+								resolve(false);
 						}
 					}).start();
 				}

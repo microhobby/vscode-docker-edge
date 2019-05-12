@@ -78,9 +78,11 @@ export function activate(context: vscode.ExtensionContext) {
 		let ssh = new SSHCommands(node.ip);
 		ssh.runImage(name).then(ret => {
 			if (ret)
-				vscode.window.showInformationMessage(`New container from ${name} created 😎`);
+				vscode.window
+					.showInformationMessage(`New container from ${name} created 😎`);
 			else
-				vscode.window.showErrorMessage(`Error trying to create container from ${name}`);
+				vscode.window
+					.showErrorMessage(`Error trying to create container from ${name}`);
 		});
 	});
 
@@ -89,7 +91,19 @@ export function activate(context: vscode.ExtensionContext) {
 		let ssh = new SSHCommands(node.ip);
 
 		if (node.image)
-			ssh.deleteImage(node.image.id);
+			ssh.deleteImage(node.image.id).then(ret => {
+				if (ret) {
+					if (node.image)
+					nodeDependenciesProvider
+						.refreshItemExpander(node.image);
+					vscode.window
+						.showInformationMessage(
+							`Image ${name} deleted 😎`);
+				} else
+					vscode.window
+						.showErrorMessage(
+							`Error trying to remove ${name}`);
+			});
 	});
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
