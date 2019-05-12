@@ -165,4 +165,26 @@ export class SSHCommands {
 			}).start();
 		});
 	}
+
+	deleteImage(id: string): Promise<boolean>
+	{
+		let options: vscode.InputBoxOptions = {
+			prompt: "",
+			placeHolder: "Are you sure you want to remove this Image?"
+		}
+
+		return new Promise(resolve => {
+			vscode.window.showInputBox(options).then(value => {
+				if (value != undefined) {
+					this.ssh.exec(`docker rmi ${id}`, {
+						out: function(stdout: string) {
+							console.log(stdout);
+		
+							resolve(false);
+						}
+					}).start();
+				}
+			});
+		});
+	}
 }
