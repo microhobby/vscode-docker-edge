@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 const SSH = require('simple-ssh');
+const network = require('network');
 
 export class SSHCommands {
 	private ssh: any;
@@ -10,6 +11,30 @@ export class SSHCommands {
 			host: ip,
 			user: 'torizon',
 			pass: 'torizon'
+		});
+	}
+
+	runDockerWithMyRegistry(): Promise<boolean> {
+
+		let ssh = this.ssh;
+
+		/* first get my local ip */
+		return new Promise(resolve => {
+			network.get_active_interface(function(err: any, obj: any) {
+				if (!err) {
+					let myip = obj.ip_address;
+					ssh.exec(`echo 'torizon' | sudo -S systemctl stop docker && echo 'torizon' | sudo -S dockerd --insecure-registry ${myip}:5000`, {
+						out: function(stdout: string) {
+							/* we will never reach this */
+							console.log(stdout);
+						}
+					}).start();
+					resolve(true);
+				} else {
+					vscode.window.showWarningMessage("No internet connection? 🤔");
+					resolve(false);
+				}
+			});
 		});
 	}
 
