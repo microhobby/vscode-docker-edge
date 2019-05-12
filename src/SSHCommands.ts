@@ -5,7 +5,6 @@ const network = require('network');
 
 export class SSHCommands {
 	private ssh: any;
-	private appName: string = <string> vscode.workspace.name;
 
 	constructor(private ip: string)
 	{
@@ -169,7 +168,7 @@ export class SSHCommands {
 	{
 		return new Promise(resolve => {
 			/* normal run */
-			this.ssh.exec(`docker run --name ${this.appName} -d -it ${name}:${image.tag}`, {
+			this.ssh.exec(`docker run -d -it ${name}:${image.tag}`, {
 				out: function(stdout: string) {
 					console.log(stdout);
 				},
@@ -198,7 +197,7 @@ export class SSHCommands {
 			vscode.window.showInputBox(options).then(args => {
 				if (args != undefined) {
 					/* run generic with arguments */
-					this.ssh.exec(`docker run --name ${this.appName} \
+					this.ssh.exec(`docker run \
 					-d -it \
 					--privileged \
 					-v /var/run/dbus:/var/run/dbus \
@@ -229,7 +228,7 @@ export class SSHCommands {
 	{
 		return new Promise(resolve => {
 			/* normal run */
-			this.ssh.exec(`docker run --name ${this.appName} \
+			this.ssh.exec(`docker run \
 			-d -it --privileged \
 			-v /var/run/dbus:/var/run/dbus \
 			-v /dev:/dev ${name}:${image.tag} startx`, {
@@ -260,7 +259,7 @@ export class SSHCommands {
 			}
 
 			/* weston imx6 */
-			this.ssh.exec(`docker run --name ${this.appName} \
+			this.ssh.exec(`docker run \
 			-d -it --privileged \
 			-v /tmp:/tmp \
 			${name}:${image.tag} \
