@@ -72,6 +72,18 @@ export function activate(context: vscode.ExtensionContext) {
 				nodeDependenciesProvider.refresh();
 		});
 	});
+
+	vscode.commands.registerCommand('extension.runContainer',
+			(name: string, ip: string, node: ContainerOptions) => {
+		let ssh = new SSHCommands(node.ip);
+		ssh.runImage(name).then(ret => {
+			if (ret)
+				vscode.window.showInformationMessage(`New container from ${name} created 😎`);
+			else
+				vscode.window.showErrorMessage(`Error trying to create container from ${name}`);
+		});
+	});
+
 	vscode.commands.registerCommand('extension.runDeleteFileContainer', 
 			(name: string, ip: string, node: ContainerOptions) => {
 		let ssh = new SSHCommands(node.ip);

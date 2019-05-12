@@ -4,6 +4,7 @@ const network = require('network');
 
 export class SSHCommands {
 	private ssh: any;
+	private appName: string = <string> vscode.workspace.name;
 
 	constructor(private ip: string)
 	{
@@ -142,8 +143,18 @@ export class SSHCommands {
 	runImage(name: string): Promise<boolean>
 	{
 		return new Promise(resolve => {
-			vscode.window.showInputBox();
-			resolve(false);
+			/* normal run */
+			this.ssh.exec(`docker run --name ${this.appName} -d -it ${name}`, {
+				out: function(stdout: string) {
+					console.log(stdout);
+				},
+				exit: function(code: any) {
+					if (code === 0)
+						resolve(true);
+					else
+						resolve(false);
+				}
+			}).start();
 		});
 	}
 
