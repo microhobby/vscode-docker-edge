@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { Device } from './TorizonDevProvider';
 const SSH = require('simple-ssh');
 const network = require('network');
 
@@ -193,7 +194,38 @@ export class SSHCommands {
 			this.ssh.exec(`docker run --name ${this.appName} \
 			-d -it --privileged \
 			-v /var/run/dbus:/var/run/dbus \
-			-v /dev:/dev ${name}`, {
+			-v /dev:/dev ${name} startx`, {
+				out: function(stdout: string) {
+					console.log(stdout);
+				},
+				err: function(stderr: string) {
+					vscode.window
+						.showErrorMessage(stderr);
+				},
+				exit: function(code: any) {
+					if (code === 0)
+						resolve(true);
+					else
+						resolve(false);
+				}
+			}).start();
+		});
+	}
+
+	runWestonImage(name: string, device: Device): Promise<boolean>
+	{
+		return new Promise(resolve => {
+			let usePixman: string = "";
+
+			if (device.label.indexOf("iMX7D") != -1) {
+				usePixman = "-- --use-pixman";
+			}
+
+			/* weston imx6 */
+			this.ssh.exec(`docker run --name ${this.appName} \
+			-d -it --privileged \
+			-v /tmp:/tmp \
+			${name} weston-launch --tty=/dev/tty7 --user=root ${usePixman}`, {
 				out: function(stdout: string) {
 					console.log(stdout);
 				},

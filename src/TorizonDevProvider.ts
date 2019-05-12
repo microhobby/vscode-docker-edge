@@ -147,7 +147,8 @@ export class TorizonDeviceProvider
 
 					opts.push(new ContainerOptions(
 						"Run Weston",
-						docker.ip
+						docker.ip,
+						docker
 					));
 					opts[2].defineCommand(
 						'extension.runWestonContainer',
